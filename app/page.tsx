@@ -27,7 +27,7 @@ const Home = () => {
             </p>
             <Searchbar />
           </div>
-          <HeroCarousel/>
+          <HeroCarousel />
         </div>
       </section>
       <section className="trending-section">
