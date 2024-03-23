@@ -20,14 +20,14 @@ export const GET = async () => {
 
     const products = await Product.find({});
 
-    if (!products) throw new Error("No products found");
+    if (!products) throw new Error("No products fetched");
 
     // 1. SRAPE LATEST PRODUCT DETAILS & UPDATE DB
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
         const scrapedProduct = await scrapeAmazonProduct(currentProduct.url);
 
-        if (!scrapedProduct) throw new Error("No product found");
+        if (!scrapedProduct) return;
 
         const updatedPriceHistory = [
           ...currentProduct.priceHistory,
@@ -41,7 +41,7 @@ export const GET = async () => {
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),
         };
-
+        // Update Products IN DB
         const updatedProduct = await Product.findOneAndUpdate(
           {
             url: product.url,
@@ -78,7 +78,7 @@ export const GET = async () => {
     );
 
     return NextResponse.json({ message: "ok", data: updatedProducts });
-  } catch (error) {
-    throw new Error(`Error in GET: ${error}`);
+  } catch (error: any) {
+    throw new Error(`Failed to get all products: ${error.message}`);
   }
 };
